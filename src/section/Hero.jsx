@@ -1,15 +1,27 @@
 "use client";
-import { motion } from "framer-motion";
+
+import { motion } from "framer-motion"; // Import motion for animations
+import { useState } from "react"; // Import useState to manage state
 import { ImagesSlider } from "../components/ui/images-slider";
+import { images } from "../constants/hero";
 
 const Hero = () => {
-  const images = [
-    "https://images.unsplash.com/photo-1485433592409-9018e83a1f0d?q=80&w=1814&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1483982258113-b72862e6cff6?q=80&w=3456&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1482189349482-3defd547e0e9?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  ];
+  const [currentIndex, setCurrentIndex] = useState(0); // Initialize state for current index
+
+  const handleIndexChange = (index) => {
+    setCurrentIndex(index); // Update the currentIndex when it changes in the slider
+  };
+
   return (
-    <ImagesSlider className="h-[40rem]" images={images}>
+    <section className="relative w-full h-screen">
+      {/* Image Slider with text overlay */}
+      <ImagesSlider
+        className="h-[40rem]"
+        images={images}
+        onIndexChange={handleIndexChange} // Pass the handler to get the currentIndex
+      />
+
+      {/* Display text from the currentIndex */}
       <motion.div
         initial={{
           opacity: 0,
@@ -22,18 +34,26 @@ const Hero = () => {
         transition={{
           duration: 0.6,
         }}
-        className="z-50 flex flex-col justify-center items-center"
+        className="z-50 absolute inset-0 flex flex-col justify-center items-center"
       >
+        {/* Title text */}
         <motion.p className="font-bold text-xl md:text-6xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 py-4">
-          The hero section slideshow <br /> nobody asked for
+          {images[currentIndex]?.name} {/* Display the name of the current image */}
         </motion.p>
+
+        {/* Description text */}
+        <motion.p className="text-center text-lg text-neutral-200 px-6">
+          {images[currentIndex]?.description} {/* Display the description of the current image */}
+        </motion.p>
+
+        {/* Button */}
         <button className="px-4 py-2 backdrop-blur-sm border bg-emerald-300/10 border-emerald-500/20 text-white mx-auto text-center rounded-full relative mt-4">
           <span>Join now →</span>
-          <div className="absolute inset-x-0  h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-emerald-500 to-transparent" />
+          <div className="absolute inset-x-0 h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-emerald-500 to-transparent" />
         </button>
       </motion.div>
-    </ImagesSlider>
-  )
-}
+    </section>
+  );
+};
 
-export default Hero
+export default Hero;

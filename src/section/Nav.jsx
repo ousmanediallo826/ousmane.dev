@@ -4,7 +4,7 @@ import hamburgerIcon from '@/assets/hamburger.svg';
 
 const Nav = () => {
   return (
-    <header className="padding-x py-2 absolute z-10 w-full">
+    <header className="padding-x py-2  w-full">
     <nav className='flex justify-between items-center max-container'>
     <div className="cursor-pointer"><h2 className="font-bold  text-wrap hover:text-blue-500 ">OusArc</h2></div>
 <div>

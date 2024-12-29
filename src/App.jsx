@@ -15,7 +15,7 @@ function App() {
           <Nav />
           
           {/* Hero Section with smooth scroll and fade in */}
-          <section className=" wide:padding-r padding-b">
+          <section className="mt-5 ml-10 mr-10 rounded-2xl">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -26,7 +26,7 @@ function App() {
           </section>
           
           {/* About Section */}
-          <section className="padding">
+          <section className="padding mt-[-200px]"> {/* Reduced margin to close the gap */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

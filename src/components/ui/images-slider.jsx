@@ -1,136 +1,80 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils"; // Assuming you're using this utility
 
 export const ImagesSlider = ({
   images,
-  children,
-  overlay = true,
-  overlayClassName,
+  onIndexChange, // Callback function to send currentIndex to the parent
   className,
   autoplay = true,
-  direction = "up"
+  direction = "up", // Direction for animation
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [loadedImages, setLoadedImages] = useState([]);
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex + 1 === images.length ? 0 : prevIndex + 1);
+    const newIndex = currentIndex + 1 === images.length ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+    if (onIndexChange) onIndexChange(newIndex); // Update the parent with the new currentIndex
   };
-
-  const handlePrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex - 1 < 0 ? images.length - 1 : prevIndex - 1);
-  };
-
-  useEffect(() => {
-    loadImages();
-  }, []);
 
   const loadImages = () => {
-    setLoading(true);
     const loadPromises = images.map((image) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = image;
+        img.src = image.imgURL;
         img.onload = () => resolve(image);
         img.onerror = reject;
       });
     });
 
     Promise.all(loadPromises)
-      .then((loadedImages) => {
-        setLoadedImages(loadedImages);
-        setLoading(false);
-      })
+      .then((loaded) => setLoadedImages(loaded))
       .catch((error) => console.error("Failed to load images", error));
   };
+
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "ArrowRight") {
-        handleNext();
-      } else if (event.key === "ArrowLeft") {
-        handlePrevious();
-      }
-    };
+    loadImages();
 
-    window.addEventListener("keydown", handleKeyDown);
-
-    // autoplay
     let interval;
     if (autoplay) {
       interval = setInterval(() => {
         handleNext();
-      }, 5000);
+      }, 5000); // Adjust autoplay timing
     }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
       clearInterval(interval);
     };
-  }, []);
+  }, [autoplay, images, currentIndex]);
 
   const slideVariants = {
-    initial: {
-      scale: 0,
-      opacity: 0,
-      rotateX: 45,
-    },
-    visible: {
-      scale: 1,
-      rotateX: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: [0.645, 0.045, 0.355, 1.0],
-      },
-    },
-    upExit: {
-      opacity: 1,
-      y: "-150%",
-      transition: {
-        duration: 1,
-      },
-    },
-    downExit: {
-      opacity: 1,
-      y: "150%",
-      transition: {
-        duration: 1,
-      },
-    },
+    initial: { scale: 0.9, opacity: 0, y: direction === "up" ? "100%" : "-100%" },
+    visible: { scale: 1, opacity: 1, y: "0%", transition: { duration: 0.8 } },
+    exit: { scale: 0.9, opacity: 0, y: direction === "up" ? "-100%" : "100%", transition: { duration: 0.8 } },
   };
 
-  const areImagesLoaded = loadedImages.length > 0;
-
   return (
-    (<div
+    <div
       className={cn(
-        "overflow-hidden h-full w-full relative flex items-center justify-center",
+        "relative w-full h-full overflow-hidden flex items-center justify-center",
         className
       )}
-      style={{
-        perspective: "1000px",
-      }}>
-      {areImagesLoaded && children}
-      {areImagesLoaded && overlay && (
-        <div className={cn("absolute inset-0 bg-black/60 z-40", overlayClassName)} />
-      )}
-      {areImagesLoaded && (
-        <AnimatePresence>
+      style={{ perspective: "1000px" }}
+    >
+      <AnimatePresence>
+        {loadedImages.length > 0 && (
           <motion.img
             key={currentIndex}
-            src={loadedImages[currentIndex]}
+            src={loadedImages[currentIndex].imgURL}
             initial="initial"
             animate="visible"
-            exit={direction === "up" ? "upExit" : "downExit"}
+            exit="exit"
             variants={slideVariants}
-            className="image h-full w-full absolute inset-0 object-cover object-center" />
-        </AnimatePresence>
-      )}
-    </div>)
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
