@@ -7,6 +7,13 @@ export default {
   ],
   theme: {
   	extend: {
+      screens: {
+        xs: '600px', // Define xs for extra-small devices
+        sm: '640px', // Already defined in Tailwind
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
